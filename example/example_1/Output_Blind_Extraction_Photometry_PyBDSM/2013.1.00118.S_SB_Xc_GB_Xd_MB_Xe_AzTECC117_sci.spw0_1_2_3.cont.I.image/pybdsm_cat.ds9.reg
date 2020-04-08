@@ -1,0 +1,4 @@
+# Region file format: DS9 version 4.0
+global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+fk5
+ellipse(149.8608090192647,2.338515419887017,1.4998761739949633",1.2734865215837574",171.7899997928342) # text={2013.1.00118.S_SB_Xc_GB_Xd_MB_Xe_AzTECC117_sci.spw0_1_2_3.cont.I.image_i0_s0}

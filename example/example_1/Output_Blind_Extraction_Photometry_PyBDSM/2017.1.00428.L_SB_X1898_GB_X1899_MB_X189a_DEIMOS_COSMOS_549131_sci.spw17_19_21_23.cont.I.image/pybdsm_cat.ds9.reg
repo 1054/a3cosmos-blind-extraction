@@ -1,0 +1,4 @@
+# Region file format: DS9 version 4.0
+global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+fk5
+ellipse(150.17884780542482,2.138562991251801,1.3979168465987628",1.0",232.59367076002457) # text={2017.1.00428.L_SB_X1898_GB_X1899_MB_X189a_DEIMOS_COSMOS_549131_sci.spw17_19_21_23.cont.I.image_i0_s0}

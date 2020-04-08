@@ -1,0 +1,61 @@
+
+========================================================================
+Wed 08-04-2020 15:34:49:: INFO    : Processing 2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image.fits
+Wed 08-04-2020 15:34:49:: INFO    : PyBDSF version 1.9.2
+Wed 08-04-2020 15:34:49:: INFO    : Non-default input parameters:
+                                        filename             = '2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image.fits'
+                                        group_by_isl         = True
+                                        mean_map             = 'zero'
+                                        thresh_pix           = 4.0
+Wed 08-04-2020 15:34:49:: USERINFO: --> Opened '2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image.fits'
+Wed 08-04-2020 15:34:49:: INFO    : Original data shape of 2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image.fits: (1, 1, 560, 560)
+Wed 08-04-2020 15:34:49:: INFO    : Final data shape (npol, nchan, x, y): (1, 1, 560, 560)
+Wed 08-04-2020 15:34:49:: USERINFO: Image size .............................. : (560, 560) pixels
+Wed 08-04-2020 15:34:49:: USERINFO: Number of channels ...................... : 1
+Wed 08-04-2020 15:34:49:: USERINFO: Number of Stokes parameters ............. : 1
+Wed 08-04-2020 15:34:49:: USERINFO: Beam shape (major, minor, pos angle) .... : (1.47169e-04, 1.21557e-04, -26.6) degrees
+Wed 08-04-2020 15:34:49:: INFO    : Equinox not found in image header. Assuming J2000.
+Wed 08-04-2020 15:34:49:: USERINFO: Frequency of image ...................... : 245024.129 MHz
+Wed 08-04-2020 15:34:49:: USERINFO: Number of blank pixels .................. : 137004 (43.7%)
+Wed 08-04-2020 15:34:49:: INFO    : Raw mean (Stokes I) =  0.0005 mJy and raw rms =  0.0651 mJy 
+Wed 08-04-2020 15:34:49:: INFO    : sigma clipped mean (Stokes I) =  0.0015 mJy and  sigma clipped rms =  0.0631 mJy 
+Wed 08-04-2020 15:34:49:: USERINFO: Flux from sum of (non-blank) pixels ..... : 0.002 Jy
+Wed 08-04-2020 15:34:49:: INFO    : Estimated bmpersrc_th =  2177.78
+Wed 08-04-2020 15:34:49:: INFO    : Parameter confused is False
+Wed 08-04-2020 15:34:49:: USERINFO: --> Calculating background rms and mean images
+Wed 08-04-2020 15:34:49:: INFO    : Estimated size of brightest source (pixels) = 6
+Wed 08-04-2020 15:34:49:: INFO    : Maximum extent of largest 10-sigma island using clipped rms (pixels) = 9
+Wed 08-04-2020 15:34:49:: USERINFO: Derived rms_box (box size, step size) ... : (56, 19) pixels
+Wed 08-04-2020 15:34:49:: INFO    : Background rms and mean images computed
+Wed 08-04-2020 15:34:49:: USERINFO: --> Variation in rms image not significant
+Wed 08-04-2020 15:34:49:: USERINFO: --> Using constant background rms
+Wed 08-04-2020 15:34:49:: USERINFO: --> Using constant background mean
+Wed 08-04-2020 15:34:49:: USERINFO: Value of background rms ................. : 6.31e-05 Jy/beam
+Wed 08-04-2020 15:34:49:: USERINFO: Value of background mean ................ : 0.0 Jy/beam
+Wed 08-04-2020 15:34:49:: USERINFO: --> Expected 5-sigma-clipped false detection rate < fdr_ratio
+Wed 08-04-2020 15:34:49:: USERINFO: --> Using sigma-clipping ('hard') thresholding
+Wed 08-04-2020 15:34:49:: USERINFO: Minimum number of pixels per island ..... : 15
+Wed 08-04-2020 15:34:49:: USERINFO: Number of islands found ................. : 2
+Wed 08-04-2020 15:34:49:: USERINFO: Total number of Gaussians fit to image .. : 2
+Wed 08-04-2020 15:34:49:: USERINFO: Total flux density in model ............. : 0.002 Jy
+Wed 08-04-2020 15:34:50:: USERINFO: --> Grouping Gaussians into sources
+Wed 08-04-2020 15:34:50:: USERINFO: Number of sources formed from Gaussians   : 2
+Wed 08-04-2020 15:34:50:: INFO    : Calculating residual image after subtracting reconstructed gaussians
+Wed 08-04-2020 15:34:50:: INFO    : Statistics of the Gaussian residual image:
+                                            mean: -2.736e-08 (Jy/beam)
+                                        std. dev: 6.291e-05 (Jy/beam)
+                                            skew: -0.024
+                                        kurtosis: -0.030
+Wed 08-04-2020 15:34:50:: INFO    : Internally derived parameters:
+                                        beam                 : (0.0001471691330274, 0.0001215573483043, -26.63824462891)
+                                        bmpersrc_th          : 2177.777777777778
+                                        frequency            : 245024129129.7
+                                        indir                : './'
+                                        minpix_isl           : 15
+                                        rms_box              : (56, 19)
+                                        rms_box_bright       : (26, 9)
+                                        thresh               : 'hard'
+Wed 08-04-2020 15:34:50:: INFO    : Writing Output_Blind_Extraction_Photometry_PyBDSM/2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image/pybdsm_cat0.fits
+Wed 08-04-2020 15:34:50:: INFO    : Writing Output_Blind_Extraction_Photometry_PyBDSM/2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image/pybdsm_cat0.ds9.reg
+Wed 08-04-2020 15:34:50:: INFO    : Writing Output_Blind_Extraction_Photometry_PyBDSM/2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image/pybdsm_cat.fits
+Wed 08-04-2020 15:34:50:: INFO    : Writing Output_Blind_Extraction_Photometry_PyBDSM/2013.1.00034.S_SB_Xd_GB_Xe9_MB_Xea_highz_cell3_331108_sci.spw0_1_2_3.cont.I.image/pybdsm_cat.ds9.reg
