@@ -104,6 +104,7 @@ input_flag_maxsize_fwhm = 0.5 # flag (discard) a Gaussian if ... -- see -- http:
 input_thresh_rms = 3.0
 input_thresh_pix = 4.0
 input_group_by_isl = True
+overwrite = 0
 output_root = 'Output_Blind_Extraction_Photometry_PyBDSM'
 
 i = 1
@@ -195,6 +196,9 @@ while i < len(sys.argv):
             temp_arg_str == '-group-by-gaussian':
             input_group_by_isl = False
             print('Setting group_by_isl to %s'%(input_group_by_isl))
+        elif temp_arg_str == '-overwrite':
+            overwrite += 1
+            print('Setting overwrite to %s'%(overwrite))
     else:
         if os.path.isfile(sys.argv[i]):
             with open(sys.argv[i]) as fp:
@@ -259,62 +263,69 @@ for i in range(len(input_fits_files)):
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     # 
-    # process fits image
-    if input_rms_value > 0.0:
-        # fix input rms value
-        fit_result = bdsf.process_image(input_fits_file, \
-                                        thresh_isl = input_thresh_rms, \
-                                        thresh_pix = input_thresh_pix, \
-                                        group_by_isl = input_group_by_isl, \
-                                        #ini_gausfit = input_ini_gausfit, \
-                                        peak_fit = input_peak_fit, \
-                                        rms_map = False, \
-                                        rms_value = input_rms_value, \
-                                        mean_map = 'zero', \
-                                        flag_maxsize_bm = input_flag_maxsize_bm, \
-                                        flag_maxsize_fwhm = input_flag_maxsize_fwhm, \
-                                        verbose_fitting = input_verbose_fitting) # <20171105> allow input rms value
+    # check existing file
+    output_cat = output_dir + os.sep + 'pybdsm_cat.fits'
+    if os.path.isfile(output_cat) and not (overwrite >= 1):
+        print('Found existing output file "%s" and no overwrite. Skipping.'%(output_cat))
+        continue
     else:
-        # let PyBDSM to determine rms value, which might be not uniform.
-        fit_result = bdsf.process_image(input_fits_file, \
-                                        thresh_isl = input_thresh_rms, \
-                                        thresh_pix = input_thresh_pix, \
-                                        group_by_isl = input_group_by_isl, \
-                                        #ini_gausfit = input_ini_gausfit, \
-                                        peak_fit = input_peak_fit, \
-                                        mean_map = 'zero', \
-                                        flag_maxsize_bm = input_flag_maxsize_bm, \
-                                        flag_maxsize_fwhm = input_flag_maxsize_fwhm, \
-                                        verbose_fitting = input_verbose_fitting) # rms_map=False, rms_value=1e-5, 
-    # 
-    fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat0.fits', format = 'fits', clobber = True) # clobber = True means overwrite existing file. 
-    fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat0.ds9.reg', format = 'ds9', clobber = True)
-    fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat.fits', catalog_type = 'srl', incl_empty = input_incl_empty, format = 'fits', clobber = True) # 
-    fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat.ds9.reg', catalog_type = 'srl', incl_empty = input_incl_empty, format = 'ds9', clobber = True)
-    fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_gaus_resid.fits',        img_type = 'gaus_resid',       clobber = True) # Gaussian model residual image
-    fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_rms.fits',               img_type = 'rms',              clobber = True)
-    fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_mean.fits',              img_type = 'mean',             clobber = True)
-    fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_gaus_model.fits',        img_type = 'gaus_model',       clobber = True) # Gaussian model image
-    fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_island_mask.fits',       img_type = 'island_mask',      clobber = True) # Island mask image (0 = outside island, 1 = inside island)
-    fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_ch0.fits',               img_type = 'ch0',              clobber = True) # image used for source detection
-    # 
-    os.system('echo "%s" >> "%s"'%(input_fits_base + os.sep + 'pybdsm_cat.fits', output_list_of_catalog))
-    # 
-    os.system('echo "#!/bin/bash" > "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
-    os.system('echo "cd \\$(dirname \\\"\\${BASH_SOURCE[0]}\\\")" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
-    os.system('echo "ds9 -lock frame image -mecube pybdsm_img_*.fits -frame 2 -regions load pybdsm_cat0.ds9.reg -regions showtext no -zoom to fit -saveimage eps pybdsm_cat0.ds9.eps" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
-    os.system('chmod +x "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
-    # 
-    os.system('echo "#!/bin/bash" > "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
-    os.system('echo "cd \\$(dirname \\\"\\${BASH_SOURCE[0]}\\\")" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
-    os.system('echo "ds9 -lock frame image -mecube pybdsm_img_*.fits -frame 2 -regions load pybdsm_cat.ds9.reg -regions showtext no -zoom to fit -saveimage eps pybdsm_cat.ds9.eps" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
-    os.system('chmod +x "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
-    # 
-    print('\n')
-    sys.stdout = sys_stdout
-    # 
-    # in default 'bdsf' will create a '*.pybdsf.log' at the input fits file directory
-    os.system('mv "%s" "%s"'%(input_fits_file+'.pybdsf.log', output_log.replace('.log','.pybdsf.log')))
+        # 
+        # process fits image
+        if input_rms_value > 0.0:
+            # fix input rms value
+            fit_result = bdsf.process_image(input_fits_file, \
+                                            thresh_isl = input_thresh_rms, \
+                                            thresh_pix = input_thresh_pix, \
+                                            group_by_isl = input_group_by_isl, \
+                                            #ini_gausfit = input_ini_gausfit, \
+                                            peak_fit = input_peak_fit, \
+                                            rms_map = False, \
+                                            rms_value = input_rms_value, \
+                                            mean_map = 'zero', \
+                                            flag_maxsize_bm = input_flag_maxsize_bm, \
+                                            flag_maxsize_fwhm = input_flag_maxsize_fwhm, \
+                                            verbose_fitting = input_verbose_fitting) # <20171105> allow input rms value
+        else:
+            # let PyBDSM to determine rms value, which might be not uniform.
+            fit_result = bdsf.process_image(input_fits_file, \
+                                            thresh_isl = input_thresh_rms, \
+                                            thresh_pix = input_thresh_pix, \
+                                            group_by_isl = input_group_by_isl, \
+                                            #ini_gausfit = input_ini_gausfit, \
+                                            peak_fit = input_peak_fit, \
+                                            mean_map = 'zero', \
+                                            flag_maxsize_bm = input_flag_maxsize_bm, \
+                                            flag_maxsize_fwhm = input_flag_maxsize_fwhm, \
+                                            verbose_fitting = input_verbose_fitting) # rms_map=False, rms_value=1e-5, 
+        # 
+        fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat0.fits', format = 'fits', clobber = True) # clobber = True means overwrite existing file. 
+        fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat0.ds9.reg', format = 'ds9', clobber = True)
+        fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat.fits', catalog_type = 'srl', incl_empty = input_incl_empty, format = 'fits', clobber = True) # 
+        fit_result.write_catalog(outfile = output_dir + os.sep + 'pybdsm_cat.ds9.reg', catalog_type = 'srl', incl_empty = input_incl_empty, format = 'ds9', clobber = True)
+        fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_gaus_resid.fits',        img_type = 'gaus_resid',       clobber = True) # Gaussian model residual image
+        fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_rms.fits',               img_type = 'rms',              clobber = True)
+        fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_mean.fits',              img_type = 'mean',             clobber = True)
+        fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_gaus_model.fits',        img_type = 'gaus_model',       clobber = True) # Gaussian model image
+        fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_island_mask.fits',       img_type = 'island_mask',      clobber = True) # Island mask image (0 = outside island, 1 = inside island)
+        fit_result.export_image(outfile = output_dir + os.sep + 'pybdsm_img_ch0.fits',               img_type = 'ch0',              clobber = True) # image used for source detection
+        # 
+        os.system('echo "%s" >> "%s"'%(input_fits_base + os.sep + 'pybdsm_cat.fits', output_list_of_catalog))
+        # 
+        os.system('echo "#!/bin/bash" > "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
+        os.system('echo "cd \\$(dirname \\\"\\${BASH_SOURCE[0]}\\\")" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
+        os.system('echo "ds9 -lock frame image -mecube pybdsm_img_*.fits -frame 2 -regions load pybdsm_cat0.ds9.reg -regions showtext no -zoom to fit -saveimage eps pybdsm_cat0.ds9.eps" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
+        os.system('chmod +x "%s"'%(output_dir + os.sep + 'pybdsm_cat0.ds9.sh'))
+        # 
+        os.system('echo "#!/bin/bash" > "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
+        os.system('echo "cd \\$(dirname \\\"\\${BASH_SOURCE[0]}\\\")" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
+        os.system('echo "ds9 -lock frame image -mecube pybdsm_img_*.fits -frame 2 -regions load pybdsm_cat.ds9.reg -regions showtext no -zoom to fit -saveimage eps pybdsm_cat.ds9.eps" >> "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
+        os.system('chmod +x "%s"'%(output_dir + os.sep + 'pybdsm_cat.ds9.sh'))
+        # 
+        print('\n')
+        sys.stdout = sys_stdout
+        # 
+        # in default 'bdsf' will create a '*.pybdsf.log' at the input fits file directory
+        os.system('mv "%s" "%s"'%(input_fits_file+'.pybdsf.log', output_log.replace('.log','.pybdsf.log')))
 
 
 

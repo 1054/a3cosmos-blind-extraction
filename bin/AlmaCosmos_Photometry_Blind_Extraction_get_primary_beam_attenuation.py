@@ -15,11 +15,15 @@ from astropy.wcs.utils import proj_plane_pixel_scales
 
 
 
-input_catalog = 'Output_Blind_Extraction_Photometry_PyBDSM_Catalog.fits'
+input_root = 'Output_Blind_Extraction_Photometry_PyBDSM'
+if len(sys.argv) > 1:
+    input_root = sys.argv[1]
 
-pb_root_dir = './' # where the cont.I.pb.fits are stored
+input_catalog =input_root+ '_Catalog.fits'
 
-output_name = 'Output_Blind_Extraction_Photometry_PyBDSM_Catalog_with_Pbcor.fits'
+pb_root_dir = './Input_Images/' # where the cont.I.pb.fits are stored
+
+output_name =input_root+ '_Catalog_with_Pbcor.fits'
 
 tb = Table.read(input_catalog, format='fits')
 
