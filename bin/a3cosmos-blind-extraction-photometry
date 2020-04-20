@@ -82,7 +82,9 @@ fi
 # 
 # combine catalogs
 # 
-python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_combine_each_image_catalogs.py "$OutputDir"
+if [[ ! -f "${OutputDir}_Catalog.fits" ]]; then
+    python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_combine_each_image_catalogs.py "$OutputDir"
+fi
 
 if [[ ! -f "${OutputDir}_Catalog.fits" ]]; then
     echo "Error! Failed to find the output catalog \"${OutputDir}_Catalog.fits\"."
@@ -93,7 +95,9 @@ fi
 # 
 # get primary beam attenuation
 # 
-python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_get_primary_beam_attenuation.py "$OutputDir"
+if [[ ! -f "${OutputDir}_Catalog_with_Pbcor.fits" ]]; then
+    python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_get_primary_beam_attenuation.py "$OutputDir"
+fi
 
 if [[ ! -f "${OutputDir}_Catalog_with_Pbcor.fits" ]]; then
     echo "Error! Failed to find the output catalog \"${OutputDir}_Catalog_with_Pbcor.fits\"."
