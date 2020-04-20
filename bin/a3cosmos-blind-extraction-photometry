@@ -1,0 +1,81 @@
+#!/bin/bash
+# 
+# 
+# Last update:
+#     2017-12-06 dzliu: rename functions
+#     2018-11-27 dzliu: added more options: -galfit-prior-*
+# 
+# 
+# Description:
+#     THe aim of this code is to perform blind source extraction photometry for a given image. 
+#     This code calls PyBDSM/PyBDSF (https://github.com/lofar-astron/PyBDSF). 
+# 
+
+
+# 
+# Print Usage
+# 
+if [[ $# -eq 0 ]]; then
+    echo "Usage: "
+    echo "    almacosmos-blind-extraction-photometry XXX.fits XXX2.fits XXX3.fits"
+    echo "    almacosmos-blind-extraction-photometry XXX.fits XXX2.fits XXX3.fits -thresh-rms 3.0 -thresh-pix 4.0"
+    echo "    almacosmos-blind-extraction-photometry XXX.fits XXX2.fits XXX3.fits -thresh-rms 3.0 -thresh-pix 4.0 -flag-maxsize-bm 25 -flag-maxsize-fwhm 0.3"
+    echo "Notes:"
+    echo "    In default the output catalog will not contain empty islands (which may or may not be real sources) and will be groupped by islands (which may contains one or more Gaussians)."
+    echo "    We can set -incl-empty to include empty islands, and set -group-by-gaussian to output the catalog of each individual Gaussian shapes (multiple Gaussians can be part of a same source)."
+    exit
+fi
+
+
+
+# 
+# Get script dir
+# 
+script_dir=$(cd $(dirname "${BASH_SOURCE[0]}"); pwd)
+#if [[ -f $(dirname "$script_dir")/SETUP.bash ]]; then
+#    source $(dirname "$script_dir")/SETUP.bash
+#else
+#    echo "Error! \""$(dirname "$script_dir")/SETUP.bash"\" was not found! Please download the entire package of this code from \"https://github.com/1054/a3cosmos-blind-extraction\" then re-run this pipeline!"
+#    exit 1
+#fi
+
+if [[ -z "$LD_LIBRARY_PATH" ]] && [[ ! -z "PYTHONPATH" ]]; then
+    export LD_LIBRARY_PATH=$(echo "$PYTHONPATH" | perl -p -e 's%lib/python([0-9.]+|)/site-packages%lib%g')
+fi
+
+if [[ $(python -c 'import bdsf' 2>&1 | grep -v "numpy.core.umath" | wc -l) -ne 0 ]]; then
+    echo "Error! PyBDSF was not successfully installed or could not be loaded. Please check your system paths."
+    echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+    echo "PYTHONPATH=$PYTHONPATH"
+    exit 255
+fi
+
+
+# 
+# Go
+# 
+python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_PyBDSM.py $@
+
+if [[ ! -d "Output_Blind_Extraction_Photometry_PyBDSM" ]]; then
+    echo "Error! Failed to find the output directory \"Output_Blind_Extraction_Photometry_PyBDSM\"."
+    exit 255
+fi
+
+    
+python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_combine_each_image_catalogs.py
+
+if [[ ! -f "Output_Blind_Extraction_Photometry_PyBDSM_Catalog.fits" ]]; then
+    echo "Error! Failed to find the output catalog \"Output_Blind_Extraction_Photometry_PyBDSM_Catalog.fits\"."
+    exit 255
+fi
+
+
+python "$script_dir"/AlmaCosmos_Photometry_Blind_Extraction_get_primary_beam_attenuation.py
+
+if [[ ! -f "Output_Blind_Extraction_Photometry_PyBDSM_Catalog_with_Pbcor.fits" ]]; then
+    echo "Error! Failed to find the output catalog \"Output_Blind_Extraction_Photometry_PyBDSM_Catalog_with_Pbcor.fits\"."
+    exit 255
+fi
+
+
+
