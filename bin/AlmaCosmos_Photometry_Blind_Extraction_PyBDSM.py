@@ -60,6 +60,8 @@ if len(sys.argv) <= 1:
     print('    ')
     print('    AlmaCosmos_Photometry_Blind_Extraction_PyBDSM.py "ALMA_Image_List.txt" -thresh_pix               # (new parameter to tune, default 3.0)')
     print('    AlmaCosmos_Photometry_Blind_Extraction_PyBDSM.py "ALMA_Image_List.txt" -thresh_rms               # (new parameter to tune, default 4.0)')
+    print('    AlmaCosmos_Photometry_Blind_Extraction_PyBDSM.py "ALMA_Image_List.txt" -ref-frequency 190        # (we can also set ref frequency of the input image in GHz.)')
+    print('    AlmaCosmos_Photometry_Blind_Extraction_PyBDSM.py "ALMA_Image_List.txt" -ref-wavelength 0.87      # (we can also set ref wavelength of the input image in mm.)')
     print('    ')
     sys.exit()
 
@@ -103,6 +105,7 @@ input_flag_maxsize_fwhm = 0.5 # flag (discard) a Gaussian if ... -- see -- http:
                               # DOCUMENTATION IS WRONG! THE DEFAULT VALUE IS 0.5.
 input_thresh_rms = 3.0
 input_thresh_pix = 4.0
+input_ref_frequency = None
 input_group_by_isl = True
 overwrite = 0
 output_root = 'Output_Blind_Extraction_Photometry_PyBDSM'
@@ -196,6 +199,19 @@ while i < len(sys.argv):
             temp_arg_str == '-group-by-gaussian':
             input_group_by_isl = False
             print('Setting group_by_isl to %s'%(input_group_by_isl))
+        elif temp_arg_str == '-ref-freq' or \
+            temp_arg_str == '-ref-frequency':
+            if i+1 <= len(sys.argv)-1:
+                input_ref_frequency = float(sys.argv[i+1])
+                print('Setting input_ref_frequency to %s Hz'%(input_ref_frequency))
+                i = i + 1
+        elif temp_arg_str == '-ref-wave' or \
+            temp_arg_str == '-ref-wavelength':
+            if i+1 <= len(sys.argv)-1:
+                input_ref_wavelength = float(sys.argv[i+1])
+                input_ref_frequency = 2.99792458e2/input_ref_wavelength # wavelength in mm -> frequency in Hz
+                print('Setting input_ref_frequency to %s Hz (wavelength %s mm)'%(input_ref_frequency, input_ref_wavelength))
+                i = i + 1
         elif temp_arg_str == '-overwrite':
             overwrite += 1
             print('Setting overwrite to %s'%(overwrite))
@@ -244,6 +260,17 @@ for i in range(len(input_fits_files)):
     # 
     # get fits file name and prepare logging
     input_fits_file = input_fits_files[i]
+    # 
+    # check ref frequency
+    if input_ref_frequency is not None:
+        input_fits_file_prefix, input_fits_file_suffix = os.path.splitext(input_fits_file)
+        original_input_fits_file = input_fits_file
+        input_fits_file = input_fits_file_prefix + '_with_freq' + input_fits_file_suffix
+        with fits.open(original_input_fits_file) as hdul:
+            hdul[0].header['FREQ'] = (input_ref_frequency*1e9, 'User input ref frequency, Hz.')
+            hdul.writeto(input_fits_file, overwrite=True)
+    # 
+    # get fits file name etc
     input_fits_name = os.path.basename(input_fits_file)
     if input_fits_name.endswith('.fits') or input_fits_name.endswith('.FITS'):
         input_fits_base = (input_fits_name.rsplit('.', 1))[0] # If you want to split on the last period, use rsplit -- https://stackoverflow.com/questions/678236/how-to-get-the-filename-without-the-extension-from-a-path-in-python
