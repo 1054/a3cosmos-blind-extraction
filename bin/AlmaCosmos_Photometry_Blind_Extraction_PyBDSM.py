@@ -30,6 +30,8 @@ import logging
 #    #CDLL(os.path.abspath(os.path.dirname(__file__))+os.sep+'3rd_pybdsf'+os.sep+'linux_python3.7'+os.sep+'lib'+os.sep+'python3.7'+os.sep+'site-packages'+os.sep+'bdsf-1.9.1-py3.7-linux-x86_64.egg'+os.sep+'bdsf'+os.sep+'_cbdsm.cpython-37m-x86_64-linux-gnu.so')
 
 
+from astropy.io import fits
+
 import numpy
 import scipy
 
